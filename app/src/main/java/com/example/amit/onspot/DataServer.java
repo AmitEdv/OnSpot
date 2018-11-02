@@ -1,7 +1,6 @@
 package com.example.amit.onspot;
 
 import android.util.Log;
-
 import com.flickr4java.flickr.Flickr;
 import com.flickr4java.flickr.REST;
 import com.flickr4java.flickr.photos.PhotoList;
@@ -32,17 +31,22 @@ import com.flickr4java.flickr.photos.SearchParameters;
                 try {
                     //TODO- extract to other public method
                     mFlickrClient = new Flickr(API_KEY, API_SECRET, mRest);
+                } catch (Exception ex) {
+                    Log.d(TAG, "getPhotosAroundALocation() ERROR creating flickr client");
+                    Log.d(TAG, ex.getLocalizedMessage());
+                }
 
+                try {
                     //TODO- seperate to private methods: one that searchs and another that sets the search params
                     SearchParameters searchParameters = new SearchParameters();
                     searchParameters.setLatitude(latitudeStr);
                     searchParameters.setLongitude(longitudeStr);
-                    searchParameters.setRadius(PHOTOS_SEARCH_PARAM_LOCATION_RADIUS_KM); // Km around the given location where to search pictures
+                    searchParameters.setRadius(PHOTOS_SEARCH_PARAM_LOCATION_RADIUS_KM);
 
                     PhotoList photos = mFlickrClient.getPhotosInterface().search(searchParameters,5,1);
                     Log.d(TAG, "getPhotosAroundALocation() amount of photos found = " + photos.size());
                 } catch (Exception ex) {
-                    Log.d(TAG, "getPhotosAroundALocation() ERROR");
+                    Log.d(TAG, "getPhotosAroundALocation() ERROR searching for photos");
                     Log.d(TAG, ex.getLocalizedMessage());
                 }
             }
