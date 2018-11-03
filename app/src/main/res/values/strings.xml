@@ -1,3 +1,14 @@
 <resources>
+    <!--General-->
     <string name="app_name">On Spot</string>
+
+    <!--MainActivity-->
+    <string name="location_monitor_label">Location Monitor</string>
+
+    <!--CurrentLocationPhotosGalleryActivity-->
+    <string name="title_activity_current_location_photo_gallery">On Spot Photo Gallery</string>
+    <string name="photos_found_text">Here are some photos taken around your location</string>
+
+    <!--AppService-->
+    <string name="notification_text_found_photos_around_location" formatted="false">Spotted %d photos around your location. Press to watch.</string>
 </resources>
