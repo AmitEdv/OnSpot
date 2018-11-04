@@ -11,7 +11,6 @@ import com.flickr4java.flickr.photos.Photo;
  */
 
 class AppPhotoMetaData {
-
     private static final String TAG = "AppPhotoMetaData";
 
     private Photo mPhoto = null;

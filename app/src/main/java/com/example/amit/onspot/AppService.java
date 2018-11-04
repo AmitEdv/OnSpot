@@ -2,6 +2,7 @@ package com.example.amit.onspot;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.NotificationCompat;
@@ -92,13 +93,14 @@ public class AppService extends Service {
                 }
                 //DEBUG
                 ///////////////////
+                AppGlobals.getInstance().setCurrentLocationPhotosMetadata(photoMetadataList);
+
                 Intent intent = new Intent(AppService.this, CurrentLocationPhotoGalleryActivity.class);
                 //An activity that exists exclusively for responses to the notification.
                 //There's no reason the user would navigate to this activity during normal app use,
                 // so the activity starts a new task instead of being added to your app's existing
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 PendingIntent pendingIntent = PendingIntent.getActivity(AppService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
                 notifyUser(msgToUser, pendingIntent);
             }
         }

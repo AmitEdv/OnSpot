@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*package*/ class DataServer {
-
     private static final String TAG = "DataServer";
 
     private static final String API_KEY = "1cbf1754d8b2593e864bce045369a1e9";
