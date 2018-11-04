@@ -2,6 +2,7 @@ package com.example.amit.onspot;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.location.Location;
 import android.os.IBinder;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.NotificationCompat;
@@ -15,9 +16,17 @@ public class AppService extends Service {
     private static final int MIN_PHOTOS_TO_SHOW = 0;
     private static final int NOTIFICATIONS_ID = 0;
 
+    private AppLocationManager mAppLocationManager;
+    private LocationUpdateListener mLocationListener = new LocationUpdateListener();
     private  DataServer mDataServer = new DataServer();
     private NotificationManagerCompat mNotificationManager = null;
     private ReceivePhotosMetadataAroundLocationListener mReceivePhotosAroundLocationListener = new ReceivePhotosMetadataAroundLocationListener();
+
+    @Override
+    public void onCreate() {
+        Log.v(TAG, "onCreate");
+        mAppLocationManager = new AppLocationManager(this);
+    }
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -28,24 +37,24 @@ public class AppService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
+
+        mAppLocationManager.addLocationUpdateListener(mLocationListener);
+        /////////////////////////
+        //DEBUG - TODO - remove when done!
+        //double latitude = 32.0740381;
+        //double longitude = 34.7756635;
+        //mDataServer.getPhotosAroundALocation(latitude, longitude, mReceivePhotosAroundLocationListener);
+        //DEBUG
+        /////////////////////////
+
         return START_STICKY;
-    }
-
-    @Override
-    public void onCreate() {
-        Log.v(TAG, "onCreate");
-        //TODO- utilize the LocationManager
-        //AppLocationManager mAppLocationManager = new AppLocationManager(this);
-
-        double latitude = 32.0740381;
-        double longitude = 34.7756635;
-        mDataServer.getPhotosAroundALocation(latitude, longitude, mReceivePhotosAroundLocationListener);
     }
 
     @Override
     public void onDestroy() {
         Log.v(TAG, "onDestroy");
         super.onDestroy();
+        mAppLocationManager.removeLocationUpdateListener(mLocationListener);
     }
 
     private void notifyUser(String msgToUser, PendingIntent intentOfActivityToInvoke) {
@@ -107,6 +116,19 @@ public class AppService extends Service {
         @Override
         public void onError(String errorMsg) {
             Log.e(TAG, "Couldn't get photos");
+        }
+    }
+
+    private class LocationUpdateListener implements IAppLocationListener {
+        private static final String TAG = "LocationUpdateListener";
+
+        @Override
+        public void onLocationUpdate(Location location) {
+            double longitude = location.getLongitude();
+            double latitude = location.getLatitude();
+            Log.v(TAG, "onLocationUpdate() called with long = " + longitude + ", lat = " + latitude);
+
+            mDataServer.getPhotosAroundALocation(latitude, longitude, mReceivePhotosAroundLocationListener);
         }
     }
 }

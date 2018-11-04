@@ -9,13 +9,12 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Switch;
+import java.util.ArrayList;
+
 import static android.content.ContentValues.TAG;
 
-/**
- * Created by Amit on 26/10/2018.
- */
 
-public class AppLocationManager {
+/*package*/ class AppLocationManager {
 
     private static final String TAG = "AppLocationManager";
 
@@ -24,14 +23,15 @@ public class AppLocationManager {
 
     private LocationManager mLocationManager = null;
     private Context mContext = null;
-    LocationListener[] mLocationListeners = new LocationListener[]{new LocationListener(LocationManager.NETWORK_PROVIDER)};
+    private LocationListener[] mLocationListeners = new LocationListener[]{new LocationListener(LocationManager.GPS_PROVIDER)};
+    private ArrayList<IAppLocationListener> mAppListeners = new ArrayList<>();
 
-    public AppLocationManager(Context context) {
+    /*package*/  AppLocationManager(Context context) {
         mContext = context;
         initializeLocationManager();
         try {
             mLocationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL_MIN_MS, LOCATION_DISTANCE_MIN_METERS,
+                    LocationManager.GPS_PROVIDER, LOCATION_INTERVAL_MIN_MS, LOCATION_DISTANCE_MIN_METERS,
                     mLocationListeners[0]);
         } catch (java.lang.SecurityException ex) {
             Log.i(TAG, "fail to request location update, ignore", ex);
@@ -46,7 +46,7 @@ public class AppLocationManager {
                 try {
                     if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                             && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
+                        // TODO - handle request permissions
                         //    ActivityCompat#requestPermissions
                         // here to request the missing permissions, and then overriding
                         //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
@@ -57,10 +57,18 @@ public class AppLocationManager {
                     }
                     mLocationManager.removeUpdates(mLocationListeners[i]);
                 } catch (Exception ex) {
-                    Log.i(TAG, "fail to remove location listners, ignore", ex);
+                    Log.i(TAG, "fail to remove location listeners, ignore", ex);
                 }
             }
         }
+    }
+
+    /*package*/  void addLocationUpdateListener(IAppLocationListener listener) {
+        mAppListeners.add(listener);
+    }
+
+    /*package*/  void removeLocationUpdateListener(IAppLocationListener listener) {
+        mAppListeners.remove(listener);
     }
 
     private void initializeLocationManager() {
@@ -73,7 +81,7 @@ public class AppLocationManager {
     private class LocationListener implements android.location.LocationListener {
         Location mLastLocation;
 
-        public LocationListener(String provider) {
+        /*package*/  LocationListener(String provider) {
             Log.e(TAG, "LocationListener " + provider);
             mLastLocation = new Location(provider);
         }
@@ -82,6 +90,7 @@ public class AppLocationManager {
         public void onLocationChanged(Location location) {
             Log.e(TAG, "onLocationChanged: " + location);
             mLastLocation.set(location);
+            notifyAppLocationListeners(mLastLocation);
         }
 
         @Override
@@ -98,5 +107,11 @@ public class AppLocationManager {
         public void onStatusChanged(String provider, int status, Bundle extras) {
             Log.e(TAG, "onStatusChanged: " + provider);
         }
+
+        private void notifyAppLocationListeners(Location location) {
+            for(IAppLocationListener listener: mAppListeners) {
+                listener.onLocationUpdate(location);
+            }
+        }
     }
-}
+} //LocationManager
