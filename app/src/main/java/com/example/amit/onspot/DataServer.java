@@ -6,7 +6,8 @@ import com.flickr4java.flickr.REST;
 import com.flickr4java.flickr.photos.Photo;
 import com.flickr4java.flickr.photos.PhotoList;
 import com.flickr4java.flickr.photos.SearchParameters;
-
+import com.flickr4java.flickr.photos.Size;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,26 +21,26 @@ import java.util.List;
     private static final int PHOTOS_SEARCH_PARAM_NUM_OF_PAGE = 1;
 
     private REST mRest = new REST();
-    private Flickr mFlickrClient;
+    private Flickr mFlickrClient = null;
+
+    /*package*/ DataServer() {
+        try {
+            mFlickrClient = new Flickr(API_KEY, API_SECRET, mRest);
+        } catch (Exception ex) {
+            //TODO- mark mFlickrClient as @Nullable and handle case of null
+            Log.d(TAG, "getPhotosAroundALocation() ERROR creating flickr client");
+            Log.d(TAG, ex.getLocalizedMessage());
+        }
+    }
 
     /*package*/ void getPhotosAroundALocation(double latitude, double longitude, final IDataServerPhotoMetadataListListener listener) {
         Log.d(TAG, "getPhotosAroundALocation() called with latitude= " + latitude + "longitude = " + longitude);
-
         final String latitudeStr = String.valueOf(latitude);
         final String longitudeStr = String.valueOf(longitude);
 
         Thread thread = new Thread(new Runnable() {
-
             @Override
             public void run() {
-                try {
-                    //TODO- extract to other public method
-                    mFlickrClient = new Flickr(API_KEY, API_SECRET, mRest);
-                } catch (Exception ex) {
-                    Log.d(TAG, "getPhotosAroundALocation() ERROR creating flickr client");
-                    Log.d(TAG, ex.getLocalizedMessage());
-                }
-
                 try {
                     //TODO- separate to private methods: one that sets the search params, and another that searches (for reuse purposes)
                     SearchParameters searchParameters = new SearchParameters();
@@ -54,6 +55,33 @@ import java.util.List;
                     listener.onDataServerPhotoMetadataListReceive(createAppPhotoMetadataList(photos));
                 } catch (Exception ex) {
                     Log.d(TAG, "getPhotosAroundALocation() ERROR searching for photos");
+                    Log.d(TAG, ex.getLocalizedMessage());
+                    listener.onError(ex.getLocalizedMessage());
+                }
+            }
+        });
+
+        thread.start();
+    }
+
+    //TODO - get AppSize as param and convert to Flickr library's Size
+    /*package*/ void getPhotosAsInputStream(final List<AppPhotoMetaData>  appPhotoMetaDataList, final IDataServerPhotosStreamListener listener) {
+        final List<InputStream> photos = new ArrayList<>(appPhotoMetaDataList.size());
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                try {
+                    for(AppPhotoMetaData photoMetadata: appPhotoMetaDataList) {
+                        Photo serverPhoto = photoMetadata.getServerPhotoForDataServerUseOnly();
+                        InputStream  photoInputStream = mFlickrClient.getPhotosInterface().getImageAsStream(serverPhoto, Size.LARGE);
+                        photos.add(photoInputStream);
+                    }
+
+                    listener.onDataServerPhotosStreamListReceive(photos);
+                } catch (Exception ex) {
+                    Log.d(TAG, "getPhotosAsInputStream() ERROR requesting photos");
                     Log.d(TAG, ex.getLocalizedMessage());
                     listener.onError(ex.getLocalizedMessage());
                 }

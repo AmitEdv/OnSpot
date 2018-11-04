@@ -6,6 +6,7 @@ import java.util.List;
 /*package*/ class AppGlobals {
     private static AppGlobals ourInstance = new AppGlobals();
 
+    //TODO - check if should be WeakReference
     private List<AppPhotoMetaData> mCurrentLocationPhotosMetadataList;
 
     /*package*/ static AppGlobals getInstance() {

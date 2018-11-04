@@ -2,7 +2,6 @@ package com.example.amit.onspot;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.NotificationCompat;
@@ -16,8 +15,9 @@ public class AppService extends Service {
     private static final int MIN_PHOTOS_TO_SHOW = 0;
     private static final int NOTIFICATIONS_ID = 0;
 
-    DataServer mDataServer = new DataServer();
-    NotificationManagerCompat mNotificationManager = null;
+    private  DataServer mDataServer = new DataServer();
+    private NotificationManagerCompat mNotificationManager = null;
+    private ReceivePhotosMetadataAroundLocationListener mReceivePhotosAroundLocationListener = new ReceivePhotosMetadataAroundLocationListener();
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -39,7 +39,7 @@ public class AppService extends Service {
 
         double latitude = 32.0740381;
         double longitude = 34.7756635;
-        mDataServer.getPhotosAroundALocation(latitude, longitude, new AppServerReceivePhotosAroundLocationListener());
+        mDataServer.getPhotosAroundALocation(latitude, longitude, mReceivePhotosAroundLocationListener);
     }
 
     @Override
@@ -73,8 +73,7 @@ public class AppService extends Service {
         mNotificationManager = NotificationManagerCompat.from(this);
     }
 
-    private class AppServerReceivePhotosAroundLocationListener implements IDataServerPhotoMetadataListListener {
-
+    private class ReceivePhotosMetadataAroundLocationListener implements IDataServerPhotoMetadataListListener {
         private static final String TAG = "AroundLocationListener";
 
         @Override
