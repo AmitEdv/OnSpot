@@ -14,15 +14,31 @@
     tools:showIn="@layout/activity_current_location_photo_gallery">
 
     <TextView
+        android:id="@+id/tv_subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/photos_found_text"
+        />
+
+    <GridView
+        android:id="@+id/gv_gallery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_below="@+id/tv_subtitle"
+        android:columnWidth="100dp"
+        android:horizontalSpacing="5dp"
+        android:verticalSpacing="5dp"
+        android:numColumns="auto_fit"
+        android:stretchMode="columnWidth"
         />
 
     <ImageView
         android:id="@+id/img1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="src"
         />
 
 </RelativeLayout>

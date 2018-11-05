@@ -15,7 +15,6 @@ import static android.content.ContentValues.TAG;
 
 
 /*package*/ class AppLocationManager {
-
     private static final String TAG = "AppLocationManager";
 
     private static final int LOCATION_INTERVAL_MIN_MS = 5000;
@@ -29,18 +28,33 @@ import static android.content.ContentValues.TAG;
     /*package*/  AppLocationManager(Context context) {
         mContext = context;
         initializeLocationManager();
-        try {
-            mLocationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, LOCATION_INTERVAL_MIN_MS, LOCATION_DISTANCE_MIN_METERS,
-                    mLocationListeners[0]);
-        } catch (java.lang.SecurityException ex) {
-            Log.i(TAG, "fail to request location update, ignore", ex);
-        } catch (IllegalArgumentException ex) {
-            Log.d(TAG, "network provider does not exist, " + ex.getMessage());
+    }
+
+    /*package*/ void startLocationMonitoring() {
+        if (mLocationManager != null) {
+            try {
+                mLocationManager.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER, LOCATION_INTERVAL_MIN_MS, LOCATION_DISTANCE_MIN_METERS,
+                        mLocationListeners[0]);
+
+                //Include current location once the location monitoring is on
+                Location currLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if(currLocation != null) {
+                    Log.v(TAG, "startLocationMonitoring() got current location long = " + currLocation.getLongitude() + " lat = " + currLocation.getLatitude());
+                    notifyAppLocationListeners(currLocation);
+                } else {
+                    Log.e(TAG, "startLocationMonitoring() ERROR could not get current location!");
+                }
+
+            } catch (java.lang.SecurityException ex) {
+                Log.i(TAG, "fail to request location update, ignore", ex);
+            } catch (IllegalArgumentException ex) {
+                Log.d(TAG, "network provider does not exist, " + ex.getMessage());
+            }
         }
     }
 
-    public void EndLocationManager() {
+    /*package*/ void endLocationMonitoring() {
         if (mLocationManager != null) {
             for (int i = 0; i < mLocationListeners.length; i++) {
                 try {
@@ -64,7 +78,9 @@ import static android.content.ContentValues.TAG;
     }
 
     /*package*/  void addLocationUpdateListener(IAppLocationListener listener) {
-        mAppListeners.add(listener);
+        if(listener != null) {
+            mAppListeners.add(listener);
+        }
     }
 
     /*package*/  void removeLocationUpdateListener(IAppLocationListener listener) {
@@ -75,6 +91,12 @@ import static android.content.ContentValues.TAG;
         Log.e(TAG, "initializeLocationManager");
         if (mLocationManager == null) {
             mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+        }
+    }
+
+    private void notifyAppLocationListeners(Location location) {
+        for(IAppLocationListener listener: mAppListeners) {
+            listener.onLocationUpdate(location);
         }
     }
 
@@ -106,12 +128,6 @@ import static android.content.ContentValues.TAG;
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
             Log.e(TAG, "onStatusChanged: " + provider);
-        }
-
-        private void notifyAppLocationListeners(Location location) {
-            for(IAppLocationListener listener: mAppListeners) {
-                listener.onLocationUpdate(location);
-            }
         }
     }
 } //LocationManager

@@ -39,13 +39,7 @@ public class AppService extends Service {
         super.onStartCommand(intent, flags, startId);
 
         mAppLocationManager.addLocationUpdateListener(mLocationListener);
-        /////////////////////////
-        //DEBUG - TODO - remove when done!
-        //double latitude = 32.0740381;
-        //double longitude = 34.7756635;
-        //mDataServer.getPhotosAroundALocation(latitude, longitude, mReceivePhotosAroundLocationListener);
-        //DEBUG
-        /////////////////////////
+        mAppLocationManager.startLocationMonitoring();
 
         return START_STICKY;
     }
@@ -92,17 +86,7 @@ public class AppService extends Service {
                 Log.v(TAG, "Need to alert user");
                 String msgToUser = getString(R.string.notification_text_found_photos_around_location, photoMetadataList.size());
 
-                ///////////////////
-                //DEBUG TODO- comment out if not on debug mode
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                //DEBUG
-                ///////////////////
                 AppGlobals.getInstance().setCurrentLocationPhotosMetadata(photoMetadataList);
-
                 Intent intent = new Intent(AppService.this, CurrentLocationPhotoGalleryActivity.class);
                 //An activity that exists exclusively for responses to the notification.
                 //There's no reason the user would navigate to this activity during normal app use,
@@ -128,7 +112,7 @@ public class AppService extends Service {
             double latitude = location.getLatitude();
             Log.v(TAG, "onLocationUpdate() called with long = " + longitude + ", lat = " + latitude);
 
-            mDataServer.getPhotosAroundALocation(latitude, longitude, mReceivePhotosAroundLocationListener);
+            mDataServer.getPhotosAroundALocation(longitude, latitude, CurrentLocationPhotoGalleryActivity.MAX_NUM_PHOTOS_TO_DISPLAY, mReceivePhotosAroundLocationListener);
         }
     }
 }

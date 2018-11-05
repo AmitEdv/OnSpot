@@ -16,8 +16,7 @@ import java.util.List;
 
     private static final String API_KEY = "1cbf1754d8b2593e864bce045369a1e9";
     private static final String API_SECRET = "0069656dd0520e6b";
-    private static final int PHOTOS_SEARCH_PARAM_LOCATION_RADIUS_KM = 3;
-    private static final int PHOTOS_SEARCH_PARAM_NUM_OF_PHOTOS_PER_PAGE = 5;
+    private static final int PHOTOS_SEARCH_PARAM_LOCATION_RADIUS_KM = 10;
     private static final int PHOTOS_SEARCH_PARAM_NUM_OF_PAGE = 1;
 
     private REST mRest = new REST();
@@ -33,7 +32,7 @@ import java.util.List;
         }
     }
 
-    /*package*/ void getPhotosAroundALocation(double latitude, double longitude, final IDataServerPhotoMetadataListListener listener) {
+    /*package*/ void getPhotosAroundALocation(double longitude, double latitude, final int maxNumOfPhotos, final IDataServerPhotoMetadataListListener listener) {
         Log.d(TAG, "getPhotosAroundALocation() called with latitude= " + latitude + "longitude = " + longitude);
         final String latitudeStr = String.valueOf(latitude);
         final String longitudeStr = String.valueOf(longitude);
@@ -49,7 +48,7 @@ import java.util.List;
                     searchParameters.setRadius(PHOTOS_SEARCH_PARAM_LOCATION_RADIUS_KM);
 
                     PhotoList photos = mFlickrClient.getPhotosInterface().search(searchParameters,
-                            PHOTOS_SEARCH_PARAM_NUM_OF_PHOTOS_PER_PAGE, PHOTOS_SEARCH_PARAM_NUM_OF_PAGE);
+                            maxNumOfPhotos, PHOTOS_SEARCH_PARAM_NUM_OF_PAGE);
                     Log.d(TAG, "getPhotosAroundALocation() amount of photos found = " + photos.size());
 
                     listener.onDataServerPhotoMetadataListReceive(createAppPhotoMetadataList(photos));
