@@ -51,6 +51,10 @@ public class AppService extends Service {
         mAppLocationManager.removeLocationUpdateListener(mLocationListener);
     }
 
+    /*package*/ boolean isMonitoringLocation() {
+        return mAppLocationManager.isMonitoring();
+    }
+
     private void notifyUser(String msgToUser, PendingIntent intentOfActivityToInvoke) {
         Log.v(TAG, "notifyUser called()");
 

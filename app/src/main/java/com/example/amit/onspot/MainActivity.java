@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        updateLocationMonitoringView();
     }
 
     private void initContentView() {
@@ -45,12 +47,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-        updateLocationMonitoringView();
     }
 
-    private void updateLocationMonitoringView()
-    {
+    private void updateLocationMonitoringView() {
         boolean isMonitoring = mIsLocationMonitoring;
         mSwitchBtnLocationMonitor.setChecked(isMonitoring);
     }

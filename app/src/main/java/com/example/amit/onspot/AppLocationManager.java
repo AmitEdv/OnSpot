@@ -8,10 +8,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.widget.Switch;
 import java.util.ArrayList;
-
-import static android.content.ContentValues.TAG;
 
 
 /*package*/ class AppLocationManager {
@@ -19,10 +16,11 @@ import static android.content.ContentValues.TAG;
 
     private static final int LOCATION_INTERVAL_MIN_MS = 5000;
     private static final float LOCATION_DISTANCE_MIN_METERS = 500;
+    private static final String LOCATION_PROVIDER = LocationManager.GPS_PROVIDER;
 
     private LocationManager mLocationManager = null;
     private Context mContext = null;
-    private LocationListener[] mLocationListeners = new LocationListener[]{new LocationListener(LocationManager.GPS_PROVIDER)};
+    private LocationListener[] mLocationListeners = new LocationListener[]{new LocationListener(LOCATION_PROVIDER)};
     private ArrayList<IAppLocationListener> mAppListeners = new ArrayList<>();
 
     /*package*/  AppLocationManager(Context context) {
@@ -34,11 +32,11 @@ import static android.content.ContentValues.TAG;
         if (mLocationManager != null) {
             try {
                 mLocationManager.requestLocationUpdates(
-                        LocationManager.GPS_PROVIDER, LOCATION_INTERVAL_MIN_MS, LOCATION_DISTANCE_MIN_METERS,
+                        LOCATION_PROVIDER, LOCATION_INTERVAL_MIN_MS, LOCATION_DISTANCE_MIN_METERS,
                         mLocationListeners[0]);
 
                 //Include current location once the location monitoring is on
-                Location currLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                Location currLocation = mLocationManager.getLastKnownLocation(LOCATION_PROVIDER);
                 if(currLocation != null) {
                     Log.v(TAG, "startLocationMonitoring() got current location long = " + currLocation.getLongitude() + " lat = " + currLocation.getLatitude());
                     notifyAppLocationListeners(currLocation);
@@ -85,6 +83,10 @@ import static android.content.ContentValues.TAG;
 
     /*package*/  void removeLocationUpdateListener(IAppLocationListener listener) {
         mAppListeners.remove(listener);
+    }
+
+    /*package*/ boolean isMonitoring() {
+        return mLocationManager.isProviderEnabled(LOCATION_PROVIDER);
     }
 
     private void initializeLocationManager() {
