@@ -2,12 +2,16 @@
     <!--General-->
     <string name="app_name">On Spot</string>
 
+    <!--Options Menu-->
+    <string name="menu_option_settings_title">Settings</string>
+
     <!--MainActivity-->
     <string name="location_monitor_label">Location Monitor</string>
 
     <!--CurrentLocationPhotosGalleryActivity-->
     <string name="title_activity_current_location_photo_gallery">On Spot Photo Gallery</string>
-    <string name="photos_found_text">Here are some photos taken around your location</string>
+    <string name="photos_found_text">Here are (awe)some photos that were taken around your location!</string>
+    <string name="download_title" formatted="false">Downloading %d photos...</string>
 
     <!--AppService-->
     <string name="notification_text_found_photos_around_location" formatted="false">Spotted %d photos around your location. Press to watch.</string>

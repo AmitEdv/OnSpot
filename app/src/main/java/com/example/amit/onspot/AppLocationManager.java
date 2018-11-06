@@ -35,15 +35,6 @@ import java.util.ArrayList;
                         LOCATION_PROVIDER, LOCATION_INTERVAL_MIN_MS, LOCATION_DISTANCE_MIN_METERS,
                         mLocationListeners[0]);
 
-                //Include current location once the location monitoring is on
-                Location currLocation = mLocationManager.getLastKnownLocation(LOCATION_PROVIDER);
-                if(currLocation != null) {
-                    Log.v(TAG, "startLocationMonitoring() got current location long = " + currLocation.getLongitude() + " lat = " + currLocation.getLatitude());
-                    notifyAppLocationListeners(currLocation);
-                } else {
-                    Log.e(TAG, "startLocationMonitoring() ERROR could not get current location!");
-                }
-
             } catch (java.lang.SecurityException ex) {
                 Log.i(TAG, "fail to request location update, ignore", ex);
             } catch (IllegalArgumentException ex) {
@@ -83,10 +74,6 @@ import java.util.ArrayList;
 
     /*package*/  void removeLocationUpdateListener(IAppLocationListener listener) {
         mAppListeners.remove(listener);
-    }
-
-    /*package*/ boolean isMonitoring() {
-        return mLocationManager.isProviderEnabled(LOCATION_PROVIDER);
     }
 
     private void initializeLocationManager() {

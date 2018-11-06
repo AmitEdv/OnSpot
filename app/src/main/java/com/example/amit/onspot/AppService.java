@@ -16,6 +16,7 @@ public class AppService extends Service {
     private static final int MIN_PHOTOS_TO_SHOW = 0;
     private static final int NOTIFICATIONS_ID = 0;
 
+    private static boolean sIsServiceRunning = false;
     private AppLocationManager mAppLocationManager;
     private LocationUpdateListener mLocationListener = new LocationUpdateListener();
     private  DataServer mDataServer = new DataServer();
@@ -38,6 +39,7 @@ public class AppService extends Service {
         Log.v(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
 
+        sIsServiceRunning = true;
         mAppLocationManager.addLocationUpdateListener(mLocationListener);
         mAppLocationManager.startLocationMonitoring();
 
@@ -48,11 +50,12 @@ public class AppService extends Service {
     public void onDestroy() {
         Log.v(TAG, "onDestroy");
         super.onDestroy();
+        sIsServiceRunning = false;
         mAppLocationManager.removeLocationUpdateListener(mLocationListener);
     }
 
-    /*package*/ boolean isMonitoringLocation() {
-        return mAppLocationManager.isMonitoring();
+    /*package*/ boolean isServiceRunning() {
+        return sIsServiceRunning;
     }
 
     private void notifyUser(String msgToUser, PendingIntent intentOfActivityToInvoke) {

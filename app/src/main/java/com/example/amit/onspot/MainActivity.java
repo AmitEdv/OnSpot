@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 
 public class MainActivity extends AppCompatActivity {
@@ -12,7 +12,6 @@ public class MainActivity extends AppCompatActivity {
 
     Switch mSwitchBtnLocationMonitor;
 
-    private boolean mIsLocationMonitoring = false;
     private AppService mAppService;
     private Intent mIntentLocationService;
 
@@ -36,11 +35,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void initContentView() {
         mSwitchBtnLocationMonitor = (Switch) findViewById(R.id.switch_btn_location_monitor);
-        mSwitchBtnLocationMonitor.setOnClickListener(new View.OnClickListener() {
+        mSwitchBtnLocationMonitor.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                boolean shouldMonitorLocation = mSwitchBtnLocationMonitor.isChecked();
-                if (shouldMonitorLocation) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
                     startLocationMonitoring();
                 } else {
                     stopLocationMonitoring();
@@ -50,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateLocationMonitoringView() {
-        boolean isMonitoring = mIsLocationMonitoring;
+        boolean isMonitoring = mAppService.isServiceRunning();
         mSwitchBtnLocationMonitor.setChecked(isMonitoring);
     }
 
@@ -59,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
         startService(mIntentLocationService);
 
         //TODO - If started successfully
-        mIsLocationMonitoring = true;
         updateLocationMonitoringView();
     }
 
@@ -68,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
         stopService(mIntentLocationService);
 
         //TODO - If stopped successfully
-        mIsLocationMonitoring = false;
         updateLocationMonitoringView();
     }
 

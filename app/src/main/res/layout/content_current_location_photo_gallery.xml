@@ -20,13 +20,22 @@
         android:text="@string/photos_found_text"
         />
 
+    <TextView
+        android:id="@+id/tv_download_progress_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_subtitle"
+        android:visibility="invisible"
+        android:text="@string/download_title"
+        />
+
     <GridView
         android:id="@+id/gv_gallery"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_below="@+id/tv_subtitle"
+        android:layout_below="@+id/tv_download_progress_title"
         android:columnWidth="100dp"
         android:horizontalSpacing="5dp"
         android:verticalSpacing="5dp"
@@ -35,7 +44,7 @@
         />
 
     <ImageView
-        android:id="@+id/img1"
+        android:id="@+id/curr_location_img"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="src"
